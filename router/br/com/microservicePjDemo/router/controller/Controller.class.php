@@ -11,7 +11,7 @@
     private $dbPath;
       
     private function __construct(){
-      $this->dbPath = "sqlite:/tmp/services.sq3";
+      $this->dbPath = "sqlite:./resources/services.sq3";
     }
       
     public static function controller(){
@@ -41,7 +41,7 @@
     }
       
     public function register(stdClass $obj){
-      $this->withConnection(function($pdo) use ($obj){        
+      $this->withConnection(function($pdo) use ($obj){
         $st = $pdo->prepare("Insert into service(endpoint, endpointUrl) values(:endpoint, :endpointUrl);");
         
         $st->bindValue(":endpoint", $obj->endpoint);
