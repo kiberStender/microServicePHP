@@ -6,20 +6,19 @@
   include './autoloader.php';
   
   use br\com\microservicePjDemo\router\controller\Controller;
+  use fp\result\ResFailure;  
+  
+  function main(){
+    switch($_GET['type']){
+      case 'register': return Controller::controller()->register(json_decode($_POST['data']));
+      case 'request': return Controller::controller()->request(json_decode($_POST['data']));
+      default: return ResFailure::failure(array($_GET, $_POST));
+    }
+  }
   
   try {
   
-    switch($_GET['type']){
-      case 'register': 
-        Controller::controller()->register(json_decode($_POST['data']));
-        break;
-      case 'request':
-        Controller::controller()->request(json_decode($_POST['data']));
-        break;
-      default:
-        echo var_dump($_POST['data']);
-        break;
-    }
+    echo json_encode(main());
   } catch (Exception $e){
     echo "{\"failed\":true,\"decription\":\"$e\"}";
   }
