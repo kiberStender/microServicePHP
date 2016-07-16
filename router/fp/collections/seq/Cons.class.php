@@ -1,19 +1,27 @@
 <?php
+  
+  namespace fp\collections\seq;
+  
+  use fp\maybe\Just;
 /**
  * Description of Cons
  *
  * @author sirkleber
  */
 
-class Cons extends Seq{
+class Cons extends Seq {
     private $head_;
     private $tail_;
     
-    function __construct($head_, Seq $tail_) {
+    private function __construct($head_, Seq $tail_) {
         $this->head_ = $head_;
         $this->tail_ = $tail_;
     }
     
+    public static function cons_($head, Seq $tail) {
+      return new Cons($head, $tail);
+    }
+
     public function isEmpty() {
         return false;
     }
@@ -39,6 +47,6 @@ class Cons extends Seq{
     }
     
     public function maybeLast() {
-        return new Just($this->last());
+        return Just::just($this->last());
     }
 }

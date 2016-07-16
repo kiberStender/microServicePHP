@@ -11,7 +11,6 @@ namespace fp\collections;
 use fp\typeclasses\Monad;
 use fp\maybe\Just;
 use fp\maybe\Nothing;
-use callable;
 
 abstract class FTraversable extends Monad {
   /**
@@ -80,12 +79,15 @@ abstract class FTraversable extends Monad {
   public abstract function concat(FTraversable $prefix);
   
   public final function __toString(){
-      return "{$this->prefix()}({$this->foldLeft("", $this->toStringFrmt)})";
+      return "{$this->prefix()}({$this->foldLeft("", $this->toStringFrmt())})";
   }
   
   protected abstract function prefix();
   
-  protected abstract function toStringFrmt($acc, $x);
+  /**
+   * return callable
+   */
+  protected abstract function toStringFrmt();
   
   /**
    * The traversable length
@@ -163,6 +165,13 @@ abstract class FTraversable extends Monad {
    */
   public abstract function splitAt($n);
   
+  /**
+   * Function to transform the container in any other type based on acc type
+   * starting from the first element of the traversable
+   * @param type $acc the initial value of the transformation
+   * @param callable $f the function that will transform each element
+   * @return type
+   */
   public function foldLeft($acc, callable $f){
     if($this->isEmpty()){
       return $acc;
@@ -171,6 +180,13 @@ abstract class FTraversable extends Monad {
     }
   }
   
+  /**
+   * Function to transform the container in any other type based on acc type
+   * starting from the last element of the traversable
+   * @param type $acc the initial value of the transformation
+   * @param callable $f the function that will transform each element
+   * @return type
+   */
   public function foldRight($acc, callable $f){
     if($this->isEmpty()){
       return $acc;
@@ -179,83 +195,30 @@ abstract class FTraversable extends Monad {
     }
   }
   
-  public function map(Fn1 $f) {
+  
+  /**
+   * Function to transform this container in another continer with different or same type
+   * @param callable $f
+   * @return FTraversable
+   */
+  public function map(callable $f) {
     if($this->isEmpty()){
       return $this->empty_();
     } else {
-      return $this->tail()->map($f)->cons($f->apply($this->head()));
+      return $this->tail()->map($f)->cons($f($this->head()));
     }
   }
   
-  public function flatMap(Fn1 $f) {
+  /**
+   * Function to traverse and concatenate two traversables
+   * @param callable $f
+   * @return FTraversable
+   */
+  public function flatMap(callable $f) {
     if($this->isEmpty()){
       return $this->empty_();
     } else {
-      return $this->tail()->flatMap($f)->concat($f->apply($this->head()));
+      return $this->tail()->flatMap($f)->concat($f($this->head()));
     }
-  }
-}
-
-class ToStringFrm implements Fn2{
-  private $frmt;
-  
-  function __construct(Fn2 $frmt) {
-    $this->frmt = $frmt;
-  }
-  
-  public function apply($acc, $item) {
-    return $this->frmt->apply($acc, $item);
-  }
-}
-
-class SumFoldLeft implements Fn2{
-  public function apply($acc, $item) {
-    return $acc + $item;
-  }
-}
-
-class LengthFoldLeft implements Fn2{
-  public function apply($a, $b) {
-    return $a + 1;
-  }
-}
-
-class FilterFoldRight implements Fn2 {
-  private $p;
-  
-  public function __construct(Fn1 $p) {
-    $this->p = $p;
-  }
-  
-  public function apply($item, $acc) {
-    if($this->p->apply($item)){
-      return $acc->cons($item);
-    } else {
-      return $acc;
-    }
-  }
-}
-
-class FilterNot implements Fn1{
-  private $p;
-  
-  public function __construct(Fn1 $p) {
-    $this->p = $p;
-  }
-  
-  public function apply($item) {
-    return !$this->p->apply($item);
-  }
-}
-
-class FindContains implements Fn1{
-  private $item;
-  
-  function __construct($item) {
-    $this->item = $item;
-  }
-  
-  public function apply($a) {
-    return $this->item == $a;
   }
 }

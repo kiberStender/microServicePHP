@@ -1,33 +1,42 @@
 <?php
 
-/**
- * Description of Maybe
- *
- * @author sirkleber
- */
+  /**
+   * Description of Maybe
+   *
+   * @author sirkleber
+   */
 
-namespace fp\maybe;
+  namespace fp\maybe;
 
-abstract class Maybe extends Monad{
-  public function map(callable $f) {
-    if($this instanceof Nothing){
-      return $this;
-    } else {
-      return Just::just($f->apply($this->get()));
-    }
-  }
-  
-  public function flatMap(callable $f) {
-    if($this instanceof Nothing){
-      return $this;
+  use fp\typeclasses\Monad;
+
+  abstract class Maybe extends Monad {
+
+    public function map(callable $f) {
+      if (!$this->isDefined()) {
+        return $this;
       } else {
-        return $f->apply($this->get());
+        return Just::just($f($this->get()));
       }
+    }
+
+    public function flatMap(callable $f) {
+      if (!$this->isDefined()) {
+        return $this;
+      } else {
+        return $f($this->get());
+      }
+    }
+
+    /**
+     * @return boolean
+     */
+    public abstract function isDefined();
+
+    public abstract function getOrElse(callable $f);
+
+    public abstract function get();
+
+    public abstract function __toString();
   }
   
-  public abstract function getOrElse(callable $f);
-  
-  public abstract function get();
-  
-  public abstract function __toString();
-}

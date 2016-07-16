@@ -26,7 +26,7 @@ class Nothing extends Maybe{
     }
     
     public function getOrElse(callable $f) {
-        return $f->apply();
+        return $f();
     }
     
     public function get() {
@@ -36,4 +36,9 @@ class Nothing extends Maybe{
     public function __toString() {
         return "Nothing";
     }
-}
+
+    public function isDefined() {
+      return false;
+    }
+
+  }

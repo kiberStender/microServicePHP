@@ -1,4 +1,8 @@
 <?php
+  
+  namespace fp\collections\seq;
+  
+  use fp\maybe\Nothing;
 /**
  * Description of Nil
  *
@@ -12,7 +16,7 @@ class Nil extends Seq{
      * 
      * @return Seq
      */
-    public static function Nil(){
+    public static function nil(){
         if(!isset(self::$nil)){
             self::$nil = new Nil();
         }
@@ -42,10 +46,10 @@ class Nil extends Seq{
     }
     
     public function maybeHead() {
-        return Nothing::Nothing();
+        return Nothing::nothing();
     }
     
     public function maybeLast() {
-        return Nothing::Nothing();
+        return Nothing::nothing();
     }
 }

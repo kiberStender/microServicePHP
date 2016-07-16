@@ -9,7 +9,6 @@
 namespace fp\maybe;
 
 class Just extends Maybe {
-    private static $just_ = null;
     private $value;
     
     private function __construct($value) {
@@ -31,4 +30,9 @@ class Just extends Maybe {
     public function __toString() {
         return "Just($this->value)";
     }
-}
+
+    public function isDefined() {
+      return true;
+    }
+
+  }
