@@ -7,41 +7,15 @@
    */
 
   namespace fp\result;
+  
+  use JsonSerializable;
 
-  abstract class Result {
-
-    protected $value;
-    protected $type;
-    protected $f;
-
-    public abstract function isFailure();
-
-    public function getValue() {
-      return $this->value;
+  abstract class Result implements JsonSerializable{    
+    public final function toJson(){
+      return json_encode($this);
     }
 
-    public function getType() {
-      return $this->type;
-    }
-
-    /**
-     * @param string $type
-     * @return Result
-     */
-    public abstract function as_($type);
-
-    /**
-     * 
-     * @param callable $f
-     * @return Result
-     */
-    public abstract function withParser(callable $f);
-
-    public function getParser() {
-      return $this->f;
-    }
-    
-    public function __toString() {
+        public function __toString() {
       return "Result({$this->value})";
     }
   }
