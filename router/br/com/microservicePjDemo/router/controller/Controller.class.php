@@ -2,15 +2,9 @@
   namespace br\com\microservicePjDemo\router\controller;
     
   use stdClass;
-  use PDO;
-  use fp\result\ResSuccess;
-  use fp\result\ResFailure;
-  use fp\collections\map\Map;
-  use fp\collections\seq\Seq;
-  use fp\db\FDB;
-  use fp\db\SQL;
-  use fp\db\Row;
-  use fp\utils\unit\Unit;
+  use fp\result\{ResSuccess, ResFailure, Result};
+  use fp\collections\{map\Map, seq\Seq};
+  use fp\db\{FDB, SQL, Row};
     
   class Controller {
     private static $_instance = null;
@@ -20,33 +14,30 @@
     public static function controller(){
       if(self::$_instance == null) {
         self::$_instance = new Controller();
-      }
-        
+      }        
       return self::$_instance;
     }
     
-    public function register(stdClass $obj){
+    public function register(stdClass $obj): Result {
       return FDB::db()->withConnection(
         SQL::sql('Insert into service(endpoint, endpointUrl) values(:endpoint, :endpointUrl);')
           ->on(Map::map_(array(':endpoint', $obj->endpoint), array(':endpointUrl', $obj->endpointUrl)))
           ->executeUpdate()
       )->fold(
-        function($error){
-          echo ResFailure::failure($error);
-          return Unit::unit();
+        function(string $error){
+          return ResFailure::failure($error);
         },
-        function($rows){
+        function(int $rows){
           if($rows > 0){
-            echo ResSuccess::success('Endpoint inserted');
+            return ResSuccess::success('Endpoint inserted');
           } else {
-            echo ResFailure::failure('Failure ant inserting endpoint');
+            return ResFailure::failure('Failure ant inserting endpoint');
           }
-          return Unit::unit();
         }
       );
     }
       
-    private function curlJson($url, $data){
+    private function curlJson($url, $data): Result{
       $ch = curl_init($url . '/');
               
       curl_setopt($ch, CURLOPT_POST, true);
@@ -55,19 +46,18 @@
       curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array('data' => $data)));
       curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
               
-      //execute post              
+      //execute post
       $res = curl_exec($ch);
+      curl_close($ch);
               
       if(!$res){
-        echo ResFailure::failure($res);
+        return ResFailure::failure($res);
       } else {
-        echo ResSuccess::success($res);
+        return ResSuccess::success($res);
       }
-            
-      curl_close($ch);
     }
-      
-    public function request(stdClass $obj){
+    
+    public function request(stdClass $obj): Result{
       $that = $this;
       return FDB::db()->withConnection(
         SQL::sql('Select endpointUrl from service where endpoint = :endpoint')
@@ -75,16 +65,14 @@
           ->as_(function(Row $row){return $row->getColumn('endpointUrl');})
       )->fold(
         function($error){
-          echo ResFailure::failure($error);
-          return Unit::unit();
+          return ResFailure::failure($error);
         }, 
         function(Seq $urls)use($obj, $that){
           if($urls->length() >= 1){
-            $that->curlJson($urls->head(), $obj->data);
+            return $that->curlJson($urls->head(), $obj->data);
           } else {
-            echo ResFailure::failure('No endpoint');
-          }                  
-          return Unit::unit();
+            return ResFailure::failure('No endpoint');
+          }
         }
       );
     }
