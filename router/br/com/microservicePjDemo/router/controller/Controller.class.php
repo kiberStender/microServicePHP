@@ -5,14 +5,17 @@
   use PDO;
   use fp\result\ResSuccess;
   use fp\result\ResFailure;
+  use fp\collections\map\Map;
+  use fp\collections\seq\Seq;
+  use fp\db\FDB;
+  use fp\db\SQL;
+  use fp\db\Row;
+  use fp\utils\unit\Unit;
     
   class Controller {
     private static $_instance = null;
-    private $dbPath;
       
-    private function __construct(){
-      $this->dbPath = "sqlite:./resources/services.sq3";
-    }
+    private function __construct(){}
       
     public static function controller(){
       if(self::$_instance == null) {
@@ -21,40 +24,26 @@
         
       return self::$_instance;
     }
-      
-    private function getStringEndpoints($arr){
-      $arr_ = array();
-        
-      foreach($arr as $end){
-        array_push($arr_, $end['endpointUrl']);
-      }
-        
-      return $arr_;
-    }
-      
-    private function withConnection($fn){
-      $pdo = new PDO($this->dbPath);
-      $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        
-      $fn($pdo);
-      $pdo = null;
-    }
-      
+    
     public function register(stdClass $obj){
-      $this->withConnection(function($pdo) use ($obj){
-        $st = $pdo->prepare("Insert into service(endpoint, endpointUrl) values(:endpoint, :endpointUrl);");
-        
-        $st->bindValue(":endpoint", $obj->endpoint);
-        $st->bindValue(":endpointUrl", $obj->endpointUrl);
-        
-        $st->execute();
-        
-        if($st->rowCount() > 0){
-          echo ResSuccess::success('Endpoint inserted');
-        } else {
-          echo ResFailure::failure('Failure ant insertind endpoint');
+      return FDB::db()->withConnection(
+        SQL::sql('Insert into service(endpoint, endpointUrl) values(:endpoint, :endpointUrl);')
+          ->on(Map::map_(array(':endpoint', $obj->endpoint), array(':endpointUrl', $obj->endpointUrl)))
+          ->executeUpdate()
+      )->fold(
+        function($error){
+          echo ResFailure::failure($error);
+          return Unit::unit();
+        },
+        function($rows){
+          if($rows > 0){
+            echo ResSuccess::success('Endpoint inserted');
+          } else {
+            echo ResFailure::failure('Failure ant inserting endpoint');
+          }
+          return Unit::unit();
         }
-      });
+      );
     }
       
     private function curlJson($url, $data){
@@ -79,23 +68,24 @@
     }
       
     public function request(stdClass $obj){
-      $this->withConnection(function($pdo) use($obj){
-          
-        $st = $pdo->prepare("Select endpointUrl from service where endpoint = :endpoint");
-        
-        $st->bindValue(":endpoint", $obj->endpoint);
-        
-        $st->execute();
-          
-        $endpoints = $this->getStringEndpoints($st);
-          
-        if(sizeof($endpoints) >= 1){
-          foreach($endpoints as $url){
-            $this->curlJson($url, json_encode($obj->data));
-          }
-        } else {
-          echo ResFailure::failure("No endpoint");
+      $that = $this;
+      return FDB::db()->withConnection(
+        SQL::sql('Select endpointUrl from service where endpoint = :endpoint')
+          ->on(Map::map_(array(':endpoint', $obj->endpoint)))
+          ->as_(function(Row $row){return $row->getColumn('endpointUrl');})
+      )->fold(
+        function($error){
+          echo ResFailure::failure($error);
+          return Unit::unit();
+        }, 
+        function(Seq $urls)use($obj, $that){
+          if($urls->length() >= 1){
+            $that->curlJson($urls->head(), $obj->data);
+          } else {
+            echo ResFailure::failure('No endpoint');
+          }                  
+          return Unit::unit();
         }
-      });
+      );
     }
   }
