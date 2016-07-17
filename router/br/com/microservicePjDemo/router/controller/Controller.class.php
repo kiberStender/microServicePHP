@@ -48,10 +48,11 @@
               
       //execute post
       $res = curl_exec($ch);
+      $error = curl_error($ch);
       curl_close($ch);
               
-      if(!$res){
-        return ResFailure::failure($res);
+      if($error){
+        return ResFailure::failure($error);
       } else {
         return ResSuccess::success($res);
       }
