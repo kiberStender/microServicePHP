@@ -1,7 +1,7 @@
 <?php
 
   namespace fp\result;
-  
+
   use JsonSerializable;
 
   /**
@@ -10,6 +10,7 @@
    * @author sirkleber
    */
   class ResSuccess extends Result {
+
     /**
      *
      * @var JsonSerializable
@@ -31,5 +32,10 @@
           'result' => $this->value
       ];
     }
+
+    public function __toString() {
+      return "Success({$this->value})";
+    }
+
   }
   

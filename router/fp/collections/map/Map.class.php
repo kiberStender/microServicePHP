@@ -18,17 +18,18 @@
      *  
      * @return Map
      */
-    public static final function map_() {
-
-      $construct = function(array $args) use(&$construct) {
-        if (sizeof($args) === 0) {
-          return EmptyMap::EmptyMap();
-        } else {
-          return $construct(array_slice($args, 1))->cons($args[0]);
+    public static final function map_(...$args) {
+      $construct = function(array $args){
+        $map = EmptyMap::emptyMap();
+        
+        foreach($args as $item){
+          $map = $map->cons($item);
         }
+        
+        return $map;
       };
 
-      return $construct(func_get_args());
+      return $construct($args);
     }
 
     protected function empty_() {
@@ -142,4 +143,3 @@
     }
 
   }
-  

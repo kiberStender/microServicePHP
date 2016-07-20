@@ -15,17 +15,18 @@
      * 
      * @return Seq
      */
-    public static function seq() {
+    public static function seq(...$args) {
       
-      $construct = function (array $args) use(&$construct){
-        if (sizeof($args) === 0) {
-          return Nil::nil();
-        } else {
-          return $construct(array_slice($args, 1))->cons($args[0]);
+      function construct (array $args){
+        $seq = Nil::nil();
+        
+        foreach ($args as $value){
+          $seq = $seq->cons($value);
         }
-      };
+        return $seq;
+      }
       
-      return $construct(func_get_args());
+      return construct($args);
     }
 
     protected function empty_() {

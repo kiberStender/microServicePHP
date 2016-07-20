@@ -29,5 +29,10 @@
           'result' => ''
       ];
     }
+
+    public function __toString()  {
+      return "Failure({$this->description})";
+    }
+
   }
   
