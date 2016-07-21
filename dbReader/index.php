@@ -6,7 +6,6 @@
   include './autoloader.php';
   
   use br\com\microServicePjDemo\dbreader\controller\Controller;
-  use fp\result\ResFailure;
   
   /**
    * 
