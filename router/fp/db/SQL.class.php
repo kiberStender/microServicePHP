@@ -11,7 +11,6 @@
   use fp\collections\seq\Seq;
   use fp\collections\map\Map;
   use fp\maybe\Maybe;
-  use fp\utils\unit\Unit;
   use fp\either\Left;
   use fp\either\Right;
   use PDO;
@@ -43,15 +42,15 @@
     private function perform(callable $f){
       $that = $this;
       return function(PDO $pdo) use($that, $f){
-        $st = $pdo->prepare($this->query);
+        $st = $pdo->prepare($that->query);
         
-        $that->m->map(function($tp)use(&$st) {
-          list($k, $v) = $tp;
-          $st->bindValue($k, $v);
-          return Unit::unit();
-        });
+        $that->m->foldLeft($st, function($acc, $item){
+          list($k, $v) = $item;
+          $acc->bindValue($k, $v);
+          
+          return $acc;
+        })->execute();
         
-        $st->execute();
         $error = $st->errorInfo();
         
         if(isset($error[1])){
@@ -63,12 +62,12 @@
     }
 
     /**
-     * Funtion for insert, delete, updates and procedures sql statements
+     * Function for insert, delete, updates and procedures sql statements
      * @param Map $m
      * @return SQL
      */
-    public function on(Map $m) {
-      return new SQL($this->query, $m);
+    public function on(...$m) {
+      return new SQL($this->query, $this->m->concat(Map::map_(...$m)));
     }
 
     /**

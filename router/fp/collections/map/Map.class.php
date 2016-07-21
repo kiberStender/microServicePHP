@@ -74,7 +74,7 @@
     }
 
     public function concat(FTraversable $prefix) {
-      $helper = function(Map $acc, Map $other) use ($helper) {
+      $helper = function(Map $acc, Map $other) use (&$helper) {
         if ($other->isEmpty()) {
           return $acc;
         } else {
