@@ -21,7 +21,7 @@
     public function register(stdClass $obj): Result {
       return FDB::db()->withConnection(
         SQL::sql('Insert into service(endpoint, endpointUrl) values(:endpoint, :endpointUrl);')
-          ->on(Map::map_(array(':endpoint', $obj->endpoint), array(':endpointUrl', $obj->endpointUrl)))
+          ->on(array(':endpoint', $obj->endpoint), array(':endpointUrl', $obj->endpointUrl))
           ->executeUpdate()
       )->fold(
         function(string $error){
@@ -62,7 +62,7 @@
       $that = $this;
       return FDB::db()->withConnection(
         SQL::sql('Select endpointUrl from service where endpoint = :endpoint')
-          ->on(Map::map_(array(':endpoint', $obj->endpoint)))
+          ->on(array(':endpoint', $obj->endpoint))
           ->as_(function(Row $row){return $row->getColumn('endpointUrl');})
       )->fold(
         function($error){
