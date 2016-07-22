@@ -3,13 +3,16 @@
   namespace br\com\microServicePjDemo\dbreader\controller;
 
   use stdClass;
+  use SplFileObject;
+  use fp\collections\seq\Seq;
   use fp\result\Result;
   use fp\result\ResFailure;
   use fp\result\ResSuccess;
   use fp\collections\map\Map;
+  use fp\maybe\Just;
   use fp\db\FDB;
   use fp\db\SQL;
-  use SplFileObject;
+  use fp\db\Row;
 
   /**
    * Description of Controller
@@ -24,8 +27,12 @@
       
     }
 
+    /**
+     * 
+     * @return Controller
+     */
     public static function controller() {
-      if (isset(self::$controller_)) {
+      if (!isset(self::$controller_)) {
         self::$controller_ = new Controller();
       }
       return self::$controller_;
@@ -43,7 +50,7 @@
 
       if ($file->isFile()) {
         while (!$file->eof()) {
-          list($key, $value) = explode('=', $file->fgets());
+          list($key, $value) = explode('=', $file->fgets(), 2);
 
           $map = $map->cons(array($key, $value));
         }
@@ -53,24 +60,45 @@
       return $map;
     }
 
+    private function genericGet(string $line, array $params) {
+      list($vars, $q) = explode('|', $line);
+      return FDB::db()->withConnection(
+        SQL::sql($q . ';')->on(...$params)->as_(function(Row $rows) use($vars) {          
+          return Just::just(
+            Seq::seq(...explode(',', $vars))->foldLeft(array(), function($acc, $item) use($rows) {
+              return array_merge(
+                $acc, $rows->getColumn(trim($item))->map(function($value) use($item) {
+                  return array($item => $value);
+                })->getOrElse(function() {return array();})
+              );
+            })
+          );
+        })
+      );
+    }
+
     /**
      * Function that reads a given file to gets a given property and exec the query 
-     * assigned to this property in case it is found
+     * assigned to this property in case it has been found
      * @param stdClass $data
      * @return Result Description
      */
     public function select(stdClass $data) {
+      list($dao, $queryName) = explode('.', $data->query);
       $params = $data->params;
-
-      return $this->readResources($data->table)->get($data->query)->map(function($query) use($params) {
-        return FDB::db()->withConnection(
-          SQL::sql($query)->on($params)->as_($f)
-        )->fold(
-          ResFailure::failure, 
-          function(Result $res) {}
+      $that = $this;
+      return $this->readResources($dao)->get($queryName)->map(function($line) use($params, $that) {
+        return $that->genericGet($line, $params)->fold(
+          function(string $error) {return ResFailure::failure($error);}, 
+          function(Seq $seq) {
+            return ResSuccess::success($seq->foldLeft(array(), function($acc, $item) {
+              array_push($acc, $item);
+              return $acc;
+            }));
+          }
         );
-      })->getOrlElse(function(){
-        return ResFailure::failure('Resource Dao properties file not found!');
+      })->getOrElse(function() use($dao) {
+        return ResFailure::failure("Resource Dao properties file not found: resources/dao/{$dao}.properties");
       });
     }
 
