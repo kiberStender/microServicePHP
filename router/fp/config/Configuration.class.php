@@ -24,9 +24,9 @@
       $file = new SplFileObject('./resources/conf.properties');
       
       while(!$file->eof()){
-        list($key, $value) = explode('=', $file->fgets());
+        list($key, $value) = explode('=', $file->fgets(), 2);
         
-        $this->map = $this->map->cons(array($key, $value));
+        $this->map = $this->map->cons(array($key, trim(preg_replace('/\s+/', '', $value))));
         
       }
       
@@ -57,4 +57,3 @@
       return "{$this->map}";
     }
   }
-  

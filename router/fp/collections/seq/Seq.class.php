@@ -17,16 +17,16 @@
      */
     public static function seq(...$args) {
       
-      function construct (array $args){
+      $construct = function (array $args){
         $seq = Nil::nil();
         
         foreach ($args as $value){
           $seq = $seq->cons($value);
         }
         return $seq;
-      }
+      };
       
-      return construct($args);
+      return $construct($args);
     }
 
     protected function empty_() {
