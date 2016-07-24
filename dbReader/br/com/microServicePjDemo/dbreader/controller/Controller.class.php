@@ -23,9 +23,7 @@
 
     private static $controller_ = null;
 
-    private function __construct() {
-      
-    }
+    private function __construct() {}
 
     /**
      * 
@@ -47,7 +45,7 @@
     private function readResources(string $table) {
       $map = Map::map_();
       $file = new SplFileObject("./resources/dao/$table.properties");
-
+      
       if ($file->isFile()) {
         while (!$file->eof()) {
           list($key, $value) = explode('=', $file->fgets(), 2);
