@@ -8,17 +8,19 @@
   use br\com\microservicePjDemo\router\controller\Controller;
   use fp\result\ResFailure;  
   
-  function main(){
-    switch($_GET['type']){
+  function main(array $args){
+    switch($args['type']){
       case 'register': return Controller::controller()->register(json_decode($_POST['data']));
       case 'request': return Controller::controller()->request(json_decode($_POST['data']));
-      default: return ResFailure::failure(array($_GET, $_POST));
+      default: return ResFailure::failure(array($args, $_POST));
     }
   }
   
   try {
-  
-    echo json_encode(main());
+    header("Access-Control-Allow-Origin: *");
+    header("Cache-Control: no-cache, must-revalidate");
+    header("Content-type: application/json");
+    echo json_encode(main($_GET));
   } catch (Exception $e){
     echo "{\"failed\":true,\"decription\":\"$e\"}";
   }
