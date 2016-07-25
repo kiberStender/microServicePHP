@@ -54,7 +54,13 @@
       if($error){
         return ResFailure::failure($error);
       } else {
-        return ResSuccess::success($res);
+        $result = json_decode($res);
+        
+        if($result->failed){
+          return ResFailure::failure($result->description);
+        } else {
+          return ResSuccess::success($result->result);
+        }
       }
     }
     
