@@ -30,7 +30,7 @@
       }
     }
     
-    $data = json_encode(array('endpoint'=>'dbReader','endpointUrl'=>'http://localhost/microServicePHP/dbReader/'));
+    $data = json_encode(array('endpoint'=>'dbWriter','endpointUrl'=>'http://localhost/microServicePHP/dbWriter/'));
     
     header("Access-Control-Allow-Origin: *");
     header("Cache-Control: no-cache, must-revalidate");
