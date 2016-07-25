@@ -43,12 +43,30 @@
       if($error){
         return ResFailure::failure($error);
       } else {
-        return ResSuccess::success($res);
+        $result = json_decode($res);
+        
+        if($result->failed){
+          return ResFailure::failure($result->description);
+        } else {
+          return ResSuccess::success($result->result);
+        }
       }
     }
     
     public function login(string $user, string $password){
+      $data = array(
+          'endpoint' => 'dbReader',
+          'data' => json_encode(
+            array(
+              'query' => 'microserviceUser.loginByUser', 
+              'params' => array(array(':username', $user), array(':password', $password))
+            )
+          )
+      );
       
+      $url = 'http://localhost/microServicePHP/router/?type=request';
+      
+      return $this->curlJson($url, json_encode($data));
     }
   }
   
