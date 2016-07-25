@@ -32,5 +32,8 @@
     
     $data = json_encode(array('endpoint'=>'auth','endpointUrl'=>'http://localhost/microServicePHP/auth/'));
     
+    header("Access-Control-Allow-Origin: *");
+    header("Cache-Control: no-cache, must-revalidate");
+    header("Content-type: application/json");
     echo curlJson('http://localhost/microServicePHP/router/?type=register', $data);
   
