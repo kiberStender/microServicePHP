@@ -1,4 +1,4 @@
-(function ($, Future) {
+(function ($, Promise) {
   
   var fetch_ = function(url, user, pass){
     if (self && self.fetch) {
@@ -11,9 +11,9 @@
         }).then(
             function (response) {
               if (response.status >= 200 && response.status < 300) {
-                return Future.resolve(response);
+                return Promise.resolve(response);
               } else {
-                return Future.reject(new Error(response.statusText));
+                return Promise.reject(new Error(response.statusText));
               }
             }).then(function(response){
               return response.json();
@@ -43,7 +43,7 @@
           if(count > 0 && count < 2){
             location.href = 'main.html';
           } else {
-            alert('Usre or passwrod wrong!!!');
+            alert('User or passwrod wrong!!!');
           }
         }
       }).fail(function(jq, text, error){
