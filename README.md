@@ -57,4 +57,5 @@ The front End is not a service like the others. (unless you add a webscoket syst
 This is a simple Micro Service application. I'm not saying that it is mandatory, it is only one possible implementation of this concept. I'm not saying that everything I did (all the patterns I have created) is the better way of doing this. Again it is one way of doing this. Suggestions will be apreciated. You can use it as a model to convince your boss that PHP is not a spagetti wierd laguage he says and it can do anything another language can ^^
 
 PS: I have created in each service (excluding router for obvious reasons) a script called register.php. Here you will set the endpoint and endpoint urls do adjust to your reality.  
-PS1: Don't forget that I left all these services in one folder but you can scale this with VMs or even physical machines.
+PS1: Don't forget that I left all these services in one folder but you can scale this with VMs or even physical machines.  
+PS2: Router service was written in php 7.0 syntax style to show that each service can be implemented individually from the others.  
