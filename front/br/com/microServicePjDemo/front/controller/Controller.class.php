@@ -55,13 +55,8 @@
     
     public function login(string $user, string $password){
       $data = array(
-          'endpoint' => 'dbReader',
-          'data' => json_encode(
-            array(
-              'query' => 'microserviceUser.loginByUser', 
-              'params' => array(array(':username', $user), array(':password', $password))
-            )
-          )
+          'endpoint' => 'auth',
+          'data' => json_encode(array('username'=> $user, 'password'=> $password))
       );
       
       $url = 'http://localhost/microServicePHP/router/?type=request';
