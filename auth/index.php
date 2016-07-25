@@ -5,9 +5,11 @@
 
   include './autoloader.php';
   
-  use br\com\microservicePjDemo\router\controller\Controller;
+  use br\com\microServicePjDemo\auth\controller\Controller;
   
-  function main(array $get, array $post){}
+  function main(array $get, array $post){
+    return Controller::controller()->authenticate(json_decode($post['data']));
+  }
   
   try {
     header("Access-Control-Allow-Origin: *");
