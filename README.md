@@ -38,3 +38,11 @@ A service such only purpose is to select data from a given database and return i
   selectAllUser=username,password|Select * from microservice_user;
   ```
 * params: You have to provide an array of arrays simulating a tuple like object so each parameter is an js array with the first item being the param name prefixed with ":" because it's the PHP PDO way of indexing the values in to the SQL query and the second item being the value itself
+
+# DbWriter 
+A service such only purpose is to update the database, be update or delete or insert or even create table and similar commands. It follows the same json structure as the dbReader json request: 
+```json  
+    {"query": "resourceTableName.queryName", "params":[[":param_name", "value"], [":param_name2", "value2"]]}
+```
+
+The only difference here is that you will receive a json containing the ammount of affetecd rows and the framework do not need to infer any collumn name such as in select service, so in the resource property file you will not have to write the column names with a pipe (|) before the inser/delete/update/create table SQL query
