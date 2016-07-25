@@ -39,7 +39,12 @@
         if(response.failed){
           alert(response.description);
         } else {
-        location.href = 'main.html';
+          var [{count}] = response.result;
+          if(count > 0 && count < 2){
+            location.href = 'main.html';
+          } else {
+            alert('Usre or passwrod wrong!!!');
+          }
         }
       }).fail(function(jq, text, error){
         alert([text, error]);
