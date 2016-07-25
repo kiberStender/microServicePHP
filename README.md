@@ -46,3 +46,9 @@ A service such only purpose is to update the database, be update or delete or in
 ```
 
 The only difference here is that you will receive a json containing the ammount of affetecd rows and the framework do not need to infer any collumn name such as in select service, so in the resource property file you will not have to write the column names with a pipe (|) before the inser/delete/update/create table SQL query
+
+# Auth
+A simple service that receives authenticate the user in the application. It is just an example of how to use a service to access another. In this case, this service receives the username and password of a given user and and sends a request to dbReader to check if the user and password is correct in order to allow the user to do any action in the application. This is also an example to how this conecept is useful when we want to improve a service. For now this service only queries the database to knw whether the user and password is right or not, but it can later store it in a SQLite database, or even be an LDAP service or an OAuth without affecting the other services (with the possible exception of front end).
+
+# Front end
+The front End is not a service like the others. (unless you add a webscoket system) It does not receive requests, it only consumes the other services showing in the HTML the data values or data changes. Or even make the interface between the user and all possible action with the data.
