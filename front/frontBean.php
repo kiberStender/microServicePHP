@@ -8,9 +8,9 @@
   
   use fp\result\ResFailure;
 
-  function main(array $args) {
-    switch($args['type']){
-      case 'login': return Controller::controller()->login($_POST['user'], $_POST['pass']);
+  function main(array $get, array $post) {
+    switch($get['type']){
+      case 'login': return Controller::controller()->login($post['user'], $post['pass']);
       default : return ResFailure::failure('Invalid value!!!');
     }
   }
@@ -19,7 +19,7 @@
     header("Access-Control-Allow-Origin: *");
     header("Cache-Control: no-cache, must-revalidate");
     header("Content-type: application/json");
-    echo json_encode(main($_GET));
+    echo json_encode(main($_GET, $_POST));
   } catch (Exception $e) {
     echo "{\"failed\":true,\"decription\":\"$e\"}";
   }
