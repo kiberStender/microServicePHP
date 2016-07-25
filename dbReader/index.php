@@ -11,12 +11,15 @@
    * 
    * @return \fp\result\Result
    */
-  function main(){
+  function main(array $args){
     return Controller::controller()->select(json_decode($_POST['data']));
   }
   
   try {
-    echo json_encode(main());
+    header("Access-Control-Allow-Origin: *");
+    header("Cache-Control: no-cache, must-revalidate");
+    header("Content-type: application/json");
+    echo json_encode(main($_GET));
   } catch (Exception $e){
     echo "{\"failed\":true,\"decription\":\"$e\"}";
   }
