@@ -12,16 +12,16 @@ anything that produces an UI) is the most basic structure you'll need in a simpl
 # Router
 As said earlier, the router is a service with two functions (You might notice here that it is the only service that will have 2 functions):
 * 1st: Receive a request with type register (http://router/path/?type=register) with a json following the given structure: 
-  ```javascript
+  ```json 
     {"endpoint": "endpoint_name", "endpoint_url":"the_given_endpoint_url/"}
-  ``` 
+  ```  
   It will make router insert this data in a SQLite database
 * 2nd: Receive a request with type request (http://router/path/?type=request) with a json following the given structure: 
-  ```javascript
+  ```json 
     {"endpoint": "endpoint_name", "data":"whatever data you want to send to the endpoint process"}
-  ``` 
+  ```  
   It will make router reads the SQLite database searching for the endpoint url and send the "data" to this endpoint via PHP curl function
 
 PS: I don't know why, but, PHP curl needs you to finish the endpoint url with / (slash) in case you want to pass a queryString like: 
-http://enpoint/url/ or http://enpoint/url/?value=key 
+http://enpoint/url/ or http://enpoint/url/?value=key  
 So when sending a register request do not forget to add in the url end a / (slash)
