@@ -32,12 +32,14 @@ A service such only purpose is to select data from a given database and return i
     {"query": "resourceTableName.queryName", "params":[[":param_name", "value"], [":param_name2", "value2"]]}
 ```
 
-* resourceTableName: I created a pattern where I create a file named as TableCamelCaseWithoutUnderscores.properties and I put all queries inside this file. For a given table microservices_user I have the following file named microserviceUser.properties
-* queryName: The query you named as a property. It has a pecualiar pattern I will explain now: I found it hard to read the array provided by PDO lib and convert it to a simple json object without telling the columns name because you can use alias like "column as otherName" and I found too hard to map this kind of naming without asking the column names in the request. So I created a pattern where you add the columns you want to be part of you json object before the query itself:
-```property
-  selectAllUser=username,password|Select * from microservice_user;
-  ```
-* params: You have to provide an array of arrays simulating a tuple like object so each parameter is an js array with the first item being the param name prefixed with ":" because it's the PHP PDO way of indexing the values in to the SQL query and the second item being the value itself
+In order to let the application easy to modify in without changing the code I'm using a property file to store the queries related to a giving table. So I'm using a simple pattern based on the table name to easily index the properties file. It is up to you to name the files and name the queries properties but I'm using the following pattern: tableName.properties. And in order to specify wich property (or which query) you want to execute ypou have to provide in the json request the (property file name) dot (query name).
+
+``` property
+  #microserviceUser.properties <- file name storaged in resource folder
+  loginQuery=username|Select username from microservice_user where username=:username and password=:password
+```
+
+The above example shows how I dealt with this property file in my dbReader service. You obviously can get rid of it and do it using your own code or code style. The query property must have follow the pattern "Columns I'm selecting|sqlQuery itself". So using the above example username is the name of the column the framework will deal with. If you look the code you will understand why I needed to do this. You can provide a comma separated list of columns to specify which columns the framework will handle like: "username,password|Select * from microservice_user"
 
 # DbWriter 
 A service such only purpose is to update the database, be update or delete or insert or even create table and similar commands. It follows the same json structure as the dbReader json request: 
@@ -45,7 +47,7 @@ A service such only purpose is to update the database, be update or delete or in
     {"query": "resourceTableName.queryName", "params":[[":param_name", "value"], [":param_name2", "value2"]]}
 ```
 
-The only difference here is that you will receive a json containing the ammount of affetecd rows and the framework do not need to infer any collumn name such as in select service, so in the resource property file you will not have to write the column names with a pipe (|) before the inser/delete/update/create table SQL query
+The only difference here is that you will receive a json containing the ammount of affetecd rows and the framework do not need to infer any collumn name such as in select service, so in the resource property file you will not have to write the column names with a pipe (|) before the insert/delete/update/create table SQL query
 
 # Auth
 A simple service that authenticates the user in the application. It is just an example of how to use a service to access another. In this case, this service receives the username and password of a given user and and sends a request to dbReader to check if the user and password is correct in order to allow the user to do any action in the application. This is also an example to how this conecept is useful when we want to improve a service. For now this service only queries the database to knw whether the user and password is right or not, but it can later store it in a SQLite database, or even be an LDAP service or an OAuth without affecting the other services (with the possible exception of front end).
@@ -57,4 +59,5 @@ The front End is not a service like the others. (unless you add a webscoket syst
 This is a simple Micro Service application. I'm not saying that it is mandatory, it is only one possible implementation of this concept. I'm not saying that everything I did (all the patterns I have created) is the better way of doing this. Again it is one way of doing this. Suggestions will be apreciated. You can use it as a model to convince your boss that PHP is not a spagetti wierd laguage he says and it can do anything another language can ^^
 
 PS: I have created in each service (excluding router for obvious reasons) a script called register.php. Here you will set the endpoint and endpoint urls do adjust to your reality.  
-PS1: Don't forget that I left all these services in one folder but you can scale this with VMs or even physical machines.
+PS1: Don't forget that I left all these services in one folder but you can scale this with VMs or even physical machines.  
+PS2: Router service was written in php 7.0 syntax style to show that each service can be implemented individually from the others.  
