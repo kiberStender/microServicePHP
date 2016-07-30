@@ -12,7 +12,7 @@
     switch($get['type']){
       case 'register': return Controller::controller()->register(json_decode($post['data']));
       case 'request': return Controller::controller()->request(json_decode($post['data']));
-      default: return ResFailure::failure(array($get, $post));
+      default: return ResFailure::failure('Invalid value');
     }
   }
   

@@ -62,7 +62,7 @@
             );
             return $this->curlJson("http://$routerUrl/?type=request", json_encode($data));
           })->getOrElse(function() {
-            
+            return ResFailure::failure('No router url provided in conf.properties file!!!');
           });
     }
 
