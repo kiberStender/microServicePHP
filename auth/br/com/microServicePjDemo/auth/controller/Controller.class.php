@@ -67,7 +67,7 @@
             )
           )
         );
-        return $this->curlJson("http://$url/?type=request", json_encode($data));
+        return $this->curlJson("http://$url/", json_encode($data));
       })->getOrElse(function() {
             return ResFailure::failure('router.url was not provide in properties file!!!');
       });
