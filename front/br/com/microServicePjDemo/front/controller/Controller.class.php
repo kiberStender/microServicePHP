@@ -55,7 +55,7 @@
     }
 
     public function login(string $user, string $password) {
-      return Configuration::config()->getString('router.url')->map(function($routerUrl) {
+      return Configuration::config()->getString('router.url')->map(function($routerUrl) use($user, $password){
             $data = array(
                 'endpoint' => 'auth',
                 'data' => json_encode(array('username' => $user, 'password' => $password))
