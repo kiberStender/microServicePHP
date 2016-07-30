@@ -78,7 +78,7 @@
           if($urls->length() >= 1){
             return $that->curlJson($urls->head(), $obj->data);
           } else {
-            return ResFailure::failure('No endpoint');
+            return ResFailure::failure('No endpoint named ' . $obj->endpoint);
           }
         }
       );
