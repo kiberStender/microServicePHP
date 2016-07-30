@@ -41,7 +41,7 @@
       curl_close($ch);
               
       if($error){
-        return ResFailure::failure($error);
+        return ResFailure::failure("Error accessing: $url. $error");
       } else {
         $result = json_decode($res);
         
