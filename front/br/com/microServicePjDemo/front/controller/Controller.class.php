@@ -60,7 +60,7 @@
                 'endpoint' => 'auth',
                 'data' => json_encode(array('username' => $user, 'password' => $password))
             );
-            return $this->curlJson($routerUrl, json_encode($data));
+            return $this->curlJson("http://$routerUrl/?type=request", json_encode($data));
           })->getOrElse(function() {
             
           });
