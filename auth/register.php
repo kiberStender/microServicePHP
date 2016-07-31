@@ -8,32 +8,48 @@
 
   use fp\result\ResFailure;
   use fp\result\ResSuccess;
-  
-  function curlJson(string $url, string $data){
-      $ch = curl_init($url);
-              
-      curl_setopt($ch, CURLOPT_POST, true);
-      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-      curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type:application/x-www-form-urlencoded'));
-      curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array('data' => $data)));
-      curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-              
-      //execute post
-      $res = curl_exec($ch);
-      $error = curl_error($ch);
-      curl_close($ch);
-              
-      if($error){
-        return ResFailure::failure($error);
+  use fp\config\Configuration;
+
+  function curlJson(string $url, string $data) {
+    $ch = curl_init($url);
+
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type:application/x-www-form-urlencoded'));
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array('data' => $data)));
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+
+    //execute post
+    $res = curl_exec($ch);
+    $error = curl_error($ch);
+    curl_close($ch);
+
+    if($error){
+        return ResFailure::failure("Error accessing: $url. $error");
       } else {
-        return ResSuccess::success($res);
+        $result = json_decode($res);
+        
+        if($result->failed){
+          return ResFailure::failure($result->description);
+        } else {
+          return ResSuccess::success($result->result);
+        }
       }
-    }
-    
-    $data = json_encode(array('endpoint'=>'auth','endpointUrl'=>'http://localhost/microServicePHP/auth/'));
-    
+  }
+
+  function main() {
+    ob_clean();
     header("Access-Control-Allow-Origin: *");
     header("Cache-Control: no-cache, must-revalidate");
     header("Content-type: application/json");
-    echo curlJson('http://localhost/microServicePHP/router/?type=register', $data);
+
+    return Configuration::config()->getString('router.url')->map(function($url) {
+      $data = json_encode(array('endpoint' => 'auth', 'endpointUrl' => 'http://localhost/auth/'));
+
+      return curlJson("http://$url/?type=register", $data);
+    })->getOrElse(function() {
+      return ResFailure::failure('No router url provided in config.properties file!!!');
+    });
+  }
   
+  echo json_encode(main());
