@@ -43,19 +43,18 @@
      * @return Map
      */
     private function readResources(string $table) {
-      $map = Map::map_();
-      $file = new SplFileObject("./resources/dao/$table.properties");
-      
-      if ($file->isFile()) {
-        while (!$file->eof()) {
-          list($key, $value) = explode('=', $file->fgets(), 2);
-
+      $queries = parse_ini_file("./resources/dao/$table.properties");
+      if(sizeof($queries) > 0){
+        $map = Map::map_();
+        
+        foreach ($queries as $key => $value){
           $map = $map->cons(array($key, $value));
         }
+        
+        return $map;
+      } else {
+        return Map::map_();
       }
-
-      $file = null;
-      return $map;
     }
 
     private function genericGet(string $line, array $params) {
