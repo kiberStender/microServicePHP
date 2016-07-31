@@ -17,7 +17,7 @@
   }
 
   try {
-    ob_flush();
+    ob_clean();
     header("Access-Control-Allow-Origin: *");
     header("Cache-Control: no-cache, must-revalidate");
     header("Content-type: application/json");
