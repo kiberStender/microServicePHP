@@ -20,17 +20,23 @@
     private $map;
     
     private function __construct() {
-      $this->map = Map::map_();
-      $file = new SplFileObject('./resources/conf.properties');
+      $configs = parse_ini_file('./resources/conf.properties');
       
-      while(!$file->eof()){
-        list($key, $value) = explode('=', $file->fgets(), 2);
+      if(sizeof($configs) > 0){
+        $this->map = Map::map_();
         
-        $this->map = $this->map->cons(array($key, trim(preg_replace('/\s+/', '', $value))));
-        
+        foreach ($configs as $key => $value){
+          $this->map = $this->map->cons(array($key, $value));
+        }
+      } else {
+        return Map::map_();
       }
       
-      $file = null;
+    }
+    
+    private function startsWith($haystack, $needle) {
+      // search backwards starting from haystack length characters from the end
+      return $needle === "" || strrpos($haystack, $needle, -strlen($haystack)) !== false;
     }
     
     /**
