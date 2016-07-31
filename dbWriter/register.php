@@ -43,7 +43,7 @@
     header("Content-type: application/json");
 
     return Configuration::config()->getString('router.url')->map(function($url) {
-      $data = json_encode(array('endpoint' => 'dbWriter', 'endpointUrl' => 'http://localhost/Writer/'));
+      $data = json_encode(array('endpoint' => 'dbWriter', 'endpointUrl' => 'http://localhost/dbWriter/'));
 
       return curlJson("http://$url/?type=register", $data);
     })->getOrElse(function() {
